@@ -16,72 +16,72 @@ def process_object(object_name, base_path, output_base_path):
 
                                                       
   # Process both start and end views
-    for view in ['start', 'end']:
-        # Get the first 4 images from train folder
-        image_path = os.path.join(base_path, object_name, '*', view, 'train', '*.png')
-        image_files = sorted(glob.glob(image_path))[:4]
-        
-        if not image_files:
-            print(f"No images found for {object_name} {view}")
-            continue
-            
-        # Create output directory
-        output_dir = os.path.join(output_base_path, object_name, view)
-        os.makedirs(output_dir, exist_ok=True)
-        
-        # Process each set of 4 images as different views
-        if len(image_files) >= 4:
-            print(f"Processing {object_name} {view} images as multi-view set")
-            
-            # Load all 4 images
-            images = [
-                Image.open(image_files[0]).convert("RGBA"),
-                Image.open(image_files[1]).convert("RGBA"),
-                Image.open(image_files[2]).convert("RGBA"),
-                Image.open(image_files[3]).convert("RGBA")  # Using 4th image as additional view
-]
-            
-            # Generate mesh for the set of images
-            start_time = time.time()
-            # Run the pipeline
-            outputs = pipeline.run_multi_image(
-              images,
-                seed=1,
-                # Optional parameters
-                # sparse_structure_sampler_params={
-                #     "steps": 12,
-                #     "cfg_strength": 7.5,
-                # },
-                # slat_sampler_params={
-                #     "steps": 12,
-                #     "cfg_strength": 3,
-                # },
-            )
-            # outputs is a dictionary containing generated 3D assets in different formats:
-            # - outputs['gaussian']: a list of 3D Gaussians
-            # - outputs['radiance_field']: a list of radiance fields
-            # - outputs['mesh']: a list of meshes
-            
-            # Render the outputs
-            video = render_utils.render_video(outputs['gaussian'][0])['color']
-            imageio.mimsave(os.path.join(output_dir, f"{object_name}_{view}_gs.mp4"), video, fps=30)
-            video = render_utils.render_video(outputs['radiance_field'][0])['color']
-            imageio.mimsave(os.path.join(output_dir, f"{object_name}_{view}_rf.mp4"), video, fps=30)
-            video = render_utils.render_video(outputs['mesh'][0])['normal']
-            imageio.mimsave(os.path.join(output_dir, f"{object_name}_{view}_mesh.mp4"), video, fps=30)
-            
-            # GLB files can be extracted from the outputs
-            glb = postprocessing_utils.to_glb(
-                outputs['gaussian'][0],
-                outputs['mesh'][0],
-                # Optional parameters
-                simplify=0.95,          # Ratio of triangles to remove in the simplificatio>
-                texture_size=1024,      # Size of the texture used for the GLB
-            )
-            glb.export(output_path = os.path.join(output_dir, f'{object_name}_{view}.glb'))
-            
-            # Save Gaussians as PLY files
-            outputs['gaussian'][0].save_ply(output_path = os.path.join(output_dir, f'{object_name}_{view}.ply'))
+  for view in ['start', 'end']:
+      # Get the first 4 images from train folder
+      image_path = os.path.join(base_path, object_name, '*', view, 'train', '*.png')
+      image_files = sorted(glob.glob(image_path))[:4]
+      
+      if not image_files:
+          print(f"No images found for {object_name} {view}")
+          continue
+          
+      # Create output directory
+      output_dir = os.path.join(output_base_path, object_name, view)
+      os.makedirs(output_dir, exist_ok=True)
+      
+      # Process each set of 4 images as different views
+      if len(image_files) >= 4:
+          print(f"Processing {object_name} {view} images as multi-view set")
+          
+          # Load all 4 images
+          images = [
+              Image.open(image_files[0]).convert("RGBA"),
+              Image.open(image_files[1]).convert("RGBA"),
+              Image.open(image_files[2]).convert("RGBA"),
+              Image.open(image_files[3]).convert("RGBA")  # Using 4th image as additional view
+          ]
+          
+          # Generate mesh for the set of images
+          start_time = time.time()
+          # Run the pipeline
+          outputs = pipeline.run_multi_image(
+            images,
+              seed=1,
+              # Optional parameters
+              # sparse_structure_sampler_params={
+              #     "steps": 12,
+              #     "cfg_strength": 7.5,
+              # },
+              # slat_sampler_params={
+              #     "steps": 12,
+              #     "cfg_strength": 3,
+              # },
+          )
+          # outputs is a dictionary containing generated 3D assets in different formats:
+          # - outputs['gaussian']: a list of 3D Gaussians
+          # - outputs['radiance_field']: a list of radiance fields
+          # - outputs['mesh']: a list of meshes
+          
+          # Render the outputs
+          video = render_utils.render_video(outputs['gaussian'][0])['color']
+          imageio.mimsave(os.path.join(output_dir, f"{object_name}_{view}_gs.mp4"), video, fps=30)
+          video = render_utils.render_video(outputs['radiance_field'][0])['color']
+          imageio.mimsave(os.path.join(output_dir, f"{object_name}_{view}_rf.mp4"), video, fps=30)
+          video = render_utils.render_video(outputs['mesh'][0])['normal']
+          imageio.mimsave(os.path.join(output_dir, f"{object_name}_{view}_mesh.mp4"), video, fps=30)
+          
+          # GLB files can be extracted from the outputs
+          glb = postprocessing_utils.to_glb(
+              outputs['gaussian'][0],
+              outputs['mesh'][0],
+              # Optional parameters
+              simplify=0.95,          # Ratio of triangles to remove in the simplificatio>
+              texture_size=1024,      # Size of the texture used for the GLB
+          )
+          glb.export(output_path = os.path.join(output_dir, f'{object_name}_{view}.glb'))
+          
+          # Save Gaussians as PLY files
+          outputs['gaussian'][0].save_ply(output_path = os.path.join(output_dir, f'{object_name}_{view}.ply'))
 
 def main():
     # Base paths
