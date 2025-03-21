@@ -85,7 +85,7 @@ def process_object(object_name, base_path, output_base_path):
 
 def main():
     # Base paths
-    base_path = '/home/lschuenemann/TRELLIS/data/data/load/sapien'
+    base_path = '/home/lschuenemann/TRELLIS/data/data/sapien'
     output_base_path = '/home/lschuenemann/TRELLIS/data/data/meshes'
     
     # Get all object directories
