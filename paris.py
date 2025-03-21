@@ -11,7 +11,7 @@ from trellis.utils import render_utils, postprocessing_utils
 
 def process_object(object_name, base_path, output_base_path):
   # Load a pipeline from a model folder or a Hugging Face model hub.
-  pipeline = TrellisImageTo3DPipeline.from_pretrained("JeffreyXiang/TRELLIS-image>
+  pipeline = TrellisImageTo3DPipeline.from_pretrained("JeffreyXiang/TRELLIS-image-large")
   pipeline.cuda()
 
                                                       
