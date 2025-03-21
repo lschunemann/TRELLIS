@@ -85,7 +85,7 @@ def process_object(object_name, base_path, output_base_path):
           glb.export(os.path.join(output_dir, f'{object_name}_{view}.glb'))
           
           # Save Gaussians as PLY files
-          outputs['gaussian'][0].save_ply(output_path = os.path.join(output_dir, f'{object_name}_{view}.ply'))
+          outputs['gaussian'][0].save_ply(os.path.join(output_dir, f'{object_name}_{view}.ply'))
 
 def main():
     # Base paths
